@@ -16,11 +16,8 @@ jobs:
     # Step 1: Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Print working directory
-      run: |
-        pwd
-        ls -R
+      with:
+        submodules: recursive
 
     # Step 2: Install dependencies
     - name: Install dependencies
@@ -29,8 +26,6 @@ jobs:
     # Step 3: Configure and build the project
     - name: Configure and build
       run: |
-        git submodule update --init
-        cd ${{ github.workspace }}
         mkdir -p build
         cd build
         cmake ..
