@@ -15,5 +15,5 @@ set(CMAKE_CXX_STANDARD 17)
 include(CTest)
 
 # Add all sub directories
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/circularBufferStatic)
+add_subdirectory(external)
+add_subdirectory(circularBufferStatic)
