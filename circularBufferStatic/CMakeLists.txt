@@ -2,7 +2,7 @@ set(this circularBufferStatic)
 
 # Setup source and header files
 add_library(${this} STATIC
-circularBuffer.c
+circularBufferStatic.c
 )
 
 target_include_directories(${this}  PUBLIC
