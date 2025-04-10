@@ -5,7 +5,7 @@ if(POLICY CMP0048)
     cmake_policy(SET CMP0048 NEW)
 endif()
 
-project(circularBufferApp VERSION 0.1.0 DESCRIPTION "Circular Buffers" LANGUAGES C CXX) 
+project(circularBufferApp VERSION 0.1.1 DESCRIPTION "Circular Buffers" LANGUAGES C CXX) 
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
