@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Private API */
+/* Helper Functions */
 static uint32_t getNextIndex(uint32_t index, uint32_t capacity)
 {
     if ((++index) >= (capacity + 1))
@@ -11,8 +11,11 @@ static uint32_t getNextIndex(uint32_t index, uint32_t capacity)
     return index;
 }
 
-/* Public API */
-uint32_t circularBufferCapacity(circularBufferList_t *pList)  { return pList->capacity; }
+/* Public APIs */
+uint32_t circularBufferCapacity(circularBufferList_t *pList)  
+{ 
+    return pList->capacity; 
+}
 
 bool circularBufferIsEmpty(circularBufferList_t *pList)
 { 
