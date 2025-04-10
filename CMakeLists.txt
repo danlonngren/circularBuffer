@@ -17,3 +17,4 @@ include(CTest)
 # Add all sub directories
 add_subdirectory(external)
 add_subdirectory(circularBufferStatic)
+add_subdirectory(circularBufferDynamic)
