@@ -1,3 +1,2 @@
-external/googletest*
 build/*
 .vscode/*
