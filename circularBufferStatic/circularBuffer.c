@@ -1,4 +1,4 @@
-#include "inc/circularBuffer.h"
+#include "circularBuffer.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -55,6 +55,7 @@ cBufferStatus_t circularBufferReset(circularBufferList_t *config)
     }
     else
     {
+        
         memset(&config, 0, sizeof(circularBufferList_t));
     }
     return status;
