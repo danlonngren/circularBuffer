@@ -12,38 +12,32 @@ CBUFFER_STATUS_EMPTY            = -3,
 CBUFFER_STATUS_FAILED           = -4,
 }cBufferStatus_t;
 
-#define LIST_INIT(cap, size) { \
-    .capacity = (cap),         \
-    .dataSize = (size),        \
-    .put_index = (0),          \
-    .get_index = (0),          \
-    .counter = (0),            \
-    .dataBuffer = (NULL) }
-
 typedef struct {
-    uint32_t capacity;
-    uint32_t dataSize;
+    /* Buffer control info */
     uint32_t put_index;
     uint32_t get_index;
     uint32_t counter;
+    /* Buffer data and storage */
+    uint32_t capacity;
+    uint32_t dataSize;
     void *dataBuffer;
-} circularBufferList_t;
+} circularBuffStaticList_t;
 
 
-bool circularBufferIsEmpty(circularBufferList_t *pList);
+cBufferStatus_t circularBuffStatic_create(circularBuffStaticList_t *pBuffer, void *dataBuffer, uint32_t dataSize, uint32_t capacity);
 
-bool circularBufferIsFull(circularBufferList_t *pList);
+cBufferStatus_t circularBuffStatic_reset(circularBuffStaticList_t *pBuffer);
 
-uint32_t circularBufferCapacity(circularBufferList_t *pList);
+cBufferStatus_t circularBuffStatic_put(circularBuffStaticList_t *pBuffer, void *pData);
 
-cBufferStatus_t circularBufferCreate(circularBufferList_t *config,  void *dataBuffer, uint32_t dataSize, uint32_t capacity);
+cBufferStatus_t circularBuffStatic_putSafe(circularBuffStaticList_t *pBuffer, void *pData);
 
-cBufferStatus_t circularBufferReset(circularBufferList_t *config);
+cBufferStatus_t circularBuffStatic_get(circularBuffStaticList_t *pBuffer, void *pDataOut);
 
-cBufferStatus_t circularBufferGet(circularBufferList_t *config, void *pDataOut);
+bool circularBuffStatic_isFull(circularBuffStaticList_t *pBuffer);
 
-cBufferStatus_t circularBufferPut(circularBufferList_t *config, void *pData);
+bool circularBuffStatic_isEmpty(circularBuffStaticList_t *pBuffer);
 
-cBufferStatus_t circularBufferPutSafe(circularBufferList_t *config, void *pData);
+uint32_t circularBuffStatic_capacity(circularBuffStaticList_t *pBuffer);
 
 #endif
