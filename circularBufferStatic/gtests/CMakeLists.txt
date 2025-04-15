@@ -16,14 +16,10 @@ if (BUILD_TESTING)
         circularBufferStatic
     )
 
-    # # Include gtest and all tests in executable
-    # # Include GoogleTest module to enable test discovery and integration
-    # include (GoogleTest)
-    # gtest_discover_tests(circularBufferStaticTests)
+    # Include gtest and all tests in executable
+    # Include GoogleTest module to enable test discovery and integration
+    include (GoogleTest)
+    gtest_discover_tests(circularBufferStaticTests)
 
-    add_test(
-        NAME circularBufferStaticTests
-        COMMAND circularBufferStaticTests
-    )
     
 endif()
