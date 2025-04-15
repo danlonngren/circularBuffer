@@ -15,29 +15,39 @@ CBUFFER_STATUS_FAILED           = -4,
 typedef struct {
     /* Buffer control info */
     uint32_t put_index;
-    uint32_t get_index;
+    uint32_t pop_index;
     uint32_t counter;
     /* Buffer data and storage */
     uint32_t capacity;
     uint32_t dataSize;
-    void *dataBuffer;
+    uint8_t *dataBuffer;
 } circularBuffStaticList_t;
 
+/** @brief Creates and initializes a static circular buffer. */
+cBufferStatus_t circularBuffStatic_create(circularBuffStaticList_t *pList, void *dataBuffer, uint32_t dataSize, uint32_t capacity);
 
-cBufferStatus_t circularBuffStatic_create(circularBuffStaticList_t *pBuffer, void *dataBuffer, uint32_t dataSize, uint32_t capacity);
+/** @brief Reset list */
+cBufferStatus_t circularBuffStatic_reset(circularBuffStaticList_t *pList);
 
-cBufferStatus_t circularBuffStatic_reset(circularBuffStaticList_t *pBuffer);
+/** @brief Insert data. Will override data if list full */
+cBufferStatus_t circularBuffStatic_put(circularBuffStaticList_t *pList, void *pData);
 
-cBufferStatus_t circularBuffStatic_put(circularBuffStaticList_t *pBuffer, void *pData);
+/** @brief Insert data. Prevents data from being overriden */
+cBufferStatus_t circularBuffStatic_putSafe(circularBuffStaticList_t *pList, void *pData);
 
-cBufferStatus_t circularBuffStatic_putSafe(circularBuffStaticList_t *pBuffer, void *pData);
+/** @brief Get data */
+cBufferStatus_t circularBuffStatic_pop(circularBuffStaticList_t *pList, void *pDataOut);
 
-cBufferStatus_t circularBuffStatic_get(circularBuffStaticList_t *pBuffer, void *pDataOut);
+/** @brief Returns true if list is full */
+bool circularBuffStatic_isFull(circularBuffStaticList_t *pList);
 
-bool circularBuffStatic_isFull(circularBuffStaticList_t *pBuffer);
+/** @brief Returns true if list is empty */
+bool circularBuffStatic_isEmpty(circularBuffStaticList_t *pList);
 
-bool circularBuffStatic_isEmpty(circularBuffStaticList_t *pBuffer);
+/** @brief Returns current size */
+uint32_t circularBuffStatic_getSize(circularBuffStaticList_t *pList);
 
-uint32_t circularBuffStatic_capacity(circularBuffStaticList_t *pBuffer);
+/** @brief Returns total capacity */
+uint32_t circularBuffStatic_capacity(circularBuffStaticList_t *pList);
 
 #endif
