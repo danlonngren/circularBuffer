@@ -38,7 +38,7 @@ cBufferStatus_t circularBufferDynamicCreate(circularBufferDynamicList_t *pList, 
     }
     else
     {
-        // pList->dataBuffer = dataBuffer;
+        pList->dataBuffer = dataBuffer;
         pList->dataSize = dataSize;
         pList->capacity = (capacity / dataSize) - 1;
         pList->get_index = 0;
