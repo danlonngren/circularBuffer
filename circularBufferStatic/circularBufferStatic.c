@@ -4,151 +4,145 @@
 #include <string.h>
 
 /* Helper Functions */
-static uint32_t getNextIndex(uint32_t index, uint32_t capacity)
-{
-    if ((++index) >= (capacity + 1))
+static uint32_t getNextIndex(uint32_t index, uint32_t capacity) {
+    if ((++index) > (capacity))
         index = 0;
     return index;
 }
 
 /* Public APIs */
-uint32_t circularBufferCapacity(circularBufferList_t *pList)  
-{ 
-    return pList->capacity; 
+cBufferStatus_t circularBuffStatic_create(circularBuffStaticList_t *pList, void *dataBuffer, uint32_t dataSize, uint32_t capacity) {
+    cBufferStatus_t status = CBUFFER_STATUS_OK;
+    circularBuffStaticList_t *pListInt = pList;
+
+    if (!pListInt || !dataBuffer) {
+        status = CBUFFER_STATUS_FAILED;
+    } 
+    else {
+        pListInt->dataBuffer = dataBuffer;
+        pListInt->dataSize = dataSize;
+        pListInt->capacity = (capacity / dataSize);
+        pListInt->pop_index = 0;
+        pListInt->put_index = 0;
+        pListInt->counter = 0;
+    }
+
+    return status;
 }
 
-bool circularBufferIsEmpty(circularBufferList_t *pList)
-{ 
+cBufferStatus_t circularBuffStatic_reset(circularBuffStaticList_t *pList) {
+    cBufferStatus_t status = CBUFFER_STATUS_OK;
+    circularBuffStaticList_t *pListInt = pList;
+
+    if (!pListInt) {
+        status = CBUFFER_STATUS_FAILED;
+    } 
+    else {
+        memset(pListInt, 0, sizeof(circularBuffStaticList_t));
+    }
+    return status;
+}
+
+cBufferStatus_t circularBuffStatic_put(circularBuffStaticList_t *pList, void *pData) {
+    cBufferStatus_t status = CBUFFER_STATUS_OK;
+    circularBuffStaticList_t *pListInt = pList;
+
+    if (!pListInt || !pData) {
+        status = CBUFFER_STATUS_FAILED;
+    } 
+    else if (!pListInt->dataBuffer) {
+        status = CBUFFER_STATUS_NOT_INITIALISED;
+    }
+    else {
+        memcpy((void *)&pList->dataBuffer[pListInt->put_index * pListInt->dataSize], pData, pListInt->dataSize);
+        pListInt->put_index = getNextIndex(pListInt->put_index, pListInt->capacity);
+        /* Handle wraparound */
+        if (++pListInt->counter > pListInt->capacity) {
+            pListInt->counter = pListInt->capacity;
+            pListInt->pop_index = getNextIndex(pListInt->pop_index, pListInt->capacity);
+        }
+        status = CBUFFER_STATUS_OK;    
+    }
+
+    return status;
+}
+
+cBufferStatus_t circularBuffStatic_putSafe(circularBuffStaticList_t *pList, void *pData) {
+    cBufferStatus_t status = CBUFFER_STATUS_OK;
+    circularBuffStaticList_t *pListInt = pList;
+
+    if (!pListInt || !pData) {
+        status = CBUFFER_STATUS_FAILED;
+    }
+    else if (!pListInt->dataBuffer) {
+        status = CBUFFER_STATUS_NOT_INITIALISED;
+    }
+    else if (circularBuffStatic_isFull(pListInt)) {
+        status = CBUFFER_STATUS_FULL;
+    }
+    else {
+        memcpy((void*)&pList->dataBuffer[pListInt->put_index * pListInt->dataSize], pData, pListInt->dataSize);
+        pListInt->put_index = getNextIndex(pListInt->put_index, pListInt->capacity);
+        if (++pListInt->counter > pListInt->capacity) {
+            pListInt->counter = pListInt->capacity;
+        }
+        status = CBUFFER_STATUS_OK;    
+    }
+
+    return status;
+}
+
+cBufferStatus_t circularBuffStatic_pop(circularBuffStaticList_t *pList, void *pDataOut) {
+    cBufferStatus_t status = CBUFFER_STATUS_OK;
+    circularBuffStaticList_t *pListInt = pList;
+
+    if (!pListInt || !pDataOut) {
+        status = CBUFFER_STATUS_FAILED;
+    }
+    else if (!pListInt->dataBuffer) {
+        status = CBUFFER_STATUS_NOT_INITIALISED;
+    }
+    else if (circularBuffStatic_isEmpty(pListInt)) {
+        status = CBUFFER_STATUS_EMPTY;
+    }
+    else {
+        uint8_t *pData = pListInt->dataBuffer;
+        memcpy(pDataOut, &pData[pListInt->pop_index * pListInt->dataSize], pListInt->dataSize);
+        pListInt->pop_index = getNextIndex(pListInt->pop_index, pListInt->capacity);
+        pListInt->counter--;
+
+        if (circularBuffStatic_isEmpty(pListInt)) {
+            pListInt->pop_index = 0;
+            pListInt->put_index = 0;
+        }
+    }
+    return status;
+}
+
+bool circularBuffStatic_isFull(circularBuffStaticList_t *pList) {
+    if (!pList) {
+        return false;
+    }
+    return (pList->counter == (pList->capacity ));
+}
+
+bool circularBuffStatic_isEmpty(circularBuffStaticList_t *pList) {
+    if (!pList) {
+        return false;
+    }
     return (pList->counter <= 0);
 }
 
-bool circularBufferIsFull(circularBufferList_t *pList)
-{ 
-    uint32_t nextIndex = getNextIndex(pList->put_index, pList->capacity);
-    return (nextIndex == pList->get_index);
+uint32_t circularBuffStatic_getSize(circularBuffStaticList_t *pList) {
+    if (!pList) {
+        return 0;
+    }
+    return pList->counter * pList->dataSize;
 }
 
-cBufferStatus_t circularBufferCreate(circularBufferList_t *config, void *dataBuffer, uint32_t dataSize, uint32_t capacity)
-{
-    cBufferStatus_t status = CBUFFER_STATUS_OK;
-
-    if (config == NULL || dataBuffer == NULL)
-    {
-        status = CBUFFER_STATUS_FAILED;
+uint32_t circularBuffStatic_capacity(circularBuffStaticList_t *pList) {
+    if (!pList) {
+        return false;
     }
-    else
-    {
-        config->dataBuffer = dataBuffer;
-        config->dataSize = dataSize;
-        config->capacity = (capacity / dataSize) - 1;
-        config->get_index = 0;
-        config->put_index = 0;
-        config->counter = 0;
-    }
-    
-    return status;
+    return pList->capacity * pList->dataSize;
 }
-
-cBufferStatus_t circularBufferReset(circularBufferList_t *config)
-{
-    cBufferStatus_t status = CBUFFER_STATUS_OK;
-    if (config == NULL)
-    {
-         status = CBUFFER_STATUS_FAILED;
-    }
-    else
-    {
-        
-        memset(config, 0, sizeof(circularBufferList_t));
-    }
-    return status;
-}
-
-static cBufferStatus_t internalCircularBufferPut(circularBufferList_t *config, void *pData)
-{
-    uint8_t *pTarget = config->dataBuffer;
-
-    memcpy(&pTarget[config->put_index * config->dataSize], pData, config->dataSize);
-    config->put_index = getNextIndex(config->put_index, config->capacity);
-    if (++config->counter > config->capacity)
-    {
-        config->counter = config->capacity;
-        config->get_index = getNextIndex(config->get_index, config->capacity);
-    }
-
-    return CBUFFER_STATUS_OK;
-}
-
-cBufferStatus_t circularBufferPut(circularBufferList_t *config, void *pData)
-{
-    cBufferStatus_t status = CBUFFER_STATUS_OK;
-
-    if (config == NULL || pData == NULL)
-    {
-        status = CBUFFER_STATUS_FAILED;
-    }
-    else if (config->dataBuffer == NULL)
-    {
-        status = CBUFFER_STATUS_NOT_INITIALISED;
-    }
-    else
-    {
-        status = internalCircularBufferPut(config, pData);
-    }
-    
-    return status;
-}
-
-cBufferStatus_t circularBufferPutSafe(circularBufferList_t *config, void *pData)
-{
-    cBufferStatus_t status = CBUFFER_STATUS_OK;
-
-    if (config == NULL || pData == NULL)
-    {
-        status = CBUFFER_STATUS_FAILED;
-    }
-    else if (config->dataBuffer == NULL)
-    {
-        status = CBUFFER_STATUS_NOT_INITIALISED;
-    }
-    else if (circularBufferIsFull(config))
-    {
-        status = CBUFFER_STATUS_FULL;
-    }
-    else
-    {
-        status = internalCircularBufferPut(config, pData);
-    }
-
-    return status;
-}
-
-
-cBufferStatus_t circularBufferGet(circularBufferList_t *config, void *pDataOut)
-{
-    cBufferStatus_t status = CBUFFER_STATUS_OK;
-
-    if (config == NULL || pDataOut == NULL)
-    {
-        status = CBUFFER_STATUS_FAILED;
-    }
-    else if (config->dataBuffer == NULL)
-    {
-        status = CBUFFER_STATUS_NOT_INITIALISED;
-    }
-    else if (circularBufferIsEmpty(config))
-    {
-        status = CBUFFER_STATUS_EMPTY;
-    }
-    else
-    {
-        uint8_t *pData = config->dataBuffer;
-
-        memcpy(pDataOut, &pData[config->get_index * config->dataSize], config->dataSize);
-        config->get_index = getNextIndex(config->get_index, config->capacity);
-        config->counter--;
-    }
-
-    return status;
-}
-

@@ -1,17 +1,10 @@
-# Setup source
-set(SOURCE
-	circularBufferStatic.c
-)
 
-# Set header files
-set(HEADER
+add_library(circularBufferStatic STATIC
+	circularBufferStatic.c
     circularBufferStatic.h
 )
 
-add_library(circularBufferStatic STATIC
-	${SOURCE}
-    ${HEADER}
+target_include_directories(circularBufferStatic
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
-
-# Add gtests to project (Google Test framework for unit testing)
-add_subdirectory(gtests)

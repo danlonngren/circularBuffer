@@ -12,38 +12,42 @@ CBUFFER_STATUS_EMPTY            = -3,
 CBUFFER_STATUS_FAILED           = -4,
 }cBufferStatus_t;
 
-#define LIST_INIT(cap, size) { \
-    .capacity = (cap),         \
-    .dataSize = (size),        \
-    .put_index = (0),          \
-    .get_index = (0),          \
-    .counter = (0),            \
-    .dataBuffer = (NULL) }
-
 typedef struct {
+    /* Buffer control info */
+    uint32_t put_index;
+    uint32_t pop_index;
+    uint32_t counter;
+    /* Buffer data and storage */
     uint32_t capacity;
     uint32_t dataSize;
-    uint32_t put_index;
-    uint32_t get_index;
-    uint32_t counter;
-    void *dataBuffer;
-} circularBufferList_t;
+    uint8_t *dataBuffer;
+} circularBuffStaticList_t;
 
+/** @brief Creates and initializes a static circular buffer. */
+cBufferStatus_t circularBuffStatic_create(circularBuffStaticList_t *pList, void *dataBuffer, uint32_t dataSize, uint32_t capacity);
 
-bool circularBufferIsEmpty(circularBufferList_t *pList);
+/** @brief Reset list */
+cBufferStatus_t circularBuffStatic_reset(circularBuffStaticList_t *pList);
 
-bool circularBufferIsFull(circularBufferList_t *pList);
+/** @brief Insert data. Will override data if list full */
+cBufferStatus_t circularBuffStatic_put(circularBuffStaticList_t *pList, void *pData);
 
-uint32_t circularBufferCapacity(circularBufferList_t *pList);
+/** @brief Insert data. Prevents data from being overriden */
+cBufferStatus_t circularBuffStatic_putSafe(circularBuffStaticList_t *pList, void *pData);
 
-cBufferStatus_t circularBufferCreate(circularBufferList_t *config,  void *dataBuffer, uint32_t dataSize, uint32_t capacity);
+/** @brief Get data */
+cBufferStatus_t circularBuffStatic_pop(circularBuffStaticList_t *pList, void *pDataOut);
 
-cBufferStatus_t circularBufferReset(circularBufferList_t *config);
+/** @brief Returns true if list is full */
+bool circularBuffStatic_isFull(circularBuffStaticList_t *pList);
 
-cBufferStatus_t circularBufferGet(circularBufferList_t *config, void *pDataOut);
+/** @brief Returns true if list is empty */
+bool circularBuffStatic_isEmpty(circularBuffStaticList_t *pList);
 
-cBufferStatus_t circularBufferPut(circularBufferList_t *config, void *pData);
+/** @brief Returns current size */
+uint32_t circularBuffStatic_getSize(circularBuffStaticList_t *pList);
 
-cBufferStatus_t circularBufferPutSafe(circularBufferList_t *config, void *pData);
+/** @brief Returns total capacity */
+uint32_t circularBuffStatic_capacity(circularBuffStaticList_t *pList);
 
 #endif
