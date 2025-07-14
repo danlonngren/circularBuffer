@@ -29,9 +29,6 @@ typedef struct {
     void *dataBuffer;
 } circularBufferDynamicList_t;
 
-int listID = 0;
-
-
 bool circularBufferDynamicIsEmpty(circularBufferDynamicList_t *pList);
 
 bool circularBufferDynamicIsFull(circularBufferDynamicList_t *pList);

@@ -28,125 +28,125 @@ bool circularBufferDynamicIsFull(circularBufferDynamicList_t *pList)
     return (nextIndex == pList->get_index);
 }
 
-cBufferStatus_t circularBufferDynamicCreate(circularBufferDynamicList_t *config, void *dataBuffer, uint32_t dataSize, uint32_t capacity)
+cBufferStatus_t circularBufferDynamicCreate(circularBufferDynamicList_t *pList, void *dataBuffer, uint32_t dataSize, uint32_t capacity)
 {
     cBufferStatus_t status = CBUFFER_STATUS_OK;
 
-    if (config == NULL || dataBuffer == NULL)
+    if (pList == NULL || dataBuffer == NULL)
     {
         status = CBUFFER_STATUS_FAILED;
     }
     else
     {
-        // config->dataBuffer = dataBuffer;
-        config->dataSize = dataSize;
-        config->capacity = (capacity / dataSize) - 1;
-        config->get_index = 0;
-        config->put_index = 0;
-        config->counter = 0;
+        // pList->dataBuffer = dataBuffer;
+        pList->dataSize = dataSize;
+        pList->capacity = (capacity / dataSize) - 1;
+        pList->get_index = 0;
+        pList->put_index = 0;
+        pList->counter = 0;
     }
     
     return status;
 }
 
-cBufferStatus_t circularBufferDynamicReset(circularBufferDynamicList_t *config)
+cBufferStatus_t circularBufferDynamicReset(circularBufferDynamicList_t *pList)
 {
     cBufferStatus_t status = CBUFFER_STATUS_OK;
-    if (config == NULL)
+    if (pList == NULL)
     {
          status = CBUFFER_STATUS_FAILED;
     }
     else
     {
         
-        memset(config, 0, sizeof(circularBufferDynamicList_t));
+        memset(pList, 0, sizeof(circularBufferDynamicList_t));
     }
     return status;
 }
 
-static cBufferStatus_t circularBufferDynamicPut_internal(circularBufferDynamicList_t *config, void *pData)
+static cBufferStatus_t circularBufferDynamicPut_internal(circularBufferDynamicList_t *pList, void *pData)
 {
-    uint8_t *pTarget = config->dataBuffer;
+    uint8_t *pTarget = pList->dataBuffer;
 
-    memcpy(&pTarget[config->put_index * config->dataSize], pData, config->dataSize);
-    config->put_index = getNextIndex(config->put_index, config->capacity);
-    if (++config->counter > config->capacity)
+    memcpy(&pTarget[pList->put_index * pList->dataSize], pData, pList->dataSize);
+    pList->put_index = getNextIndex(pList->put_index, pList->capacity);
+    if (++pList->counter > pList->capacity)
     {
-        config->counter = config->capacity;
-        config->get_index = getNextIndex(config->get_index, config->capacity);
+        pList->counter = pList->capacity;
+        pList->get_index = getNextIndex(pList->get_index, pList->capacity);
     }
 
     return CBUFFER_STATUS_OK;
 }
 
-cBufferStatus_t circularBufferDynamicPut(circularBufferDynamicList_t *config, void *pData)
+cBufferStatus_t circularBufferDynamicPut(circularBufferDynamicList_t *pList, void *pData)
 {
     cBufferStatus_t status = CBUFFER_STATUS_OK;
 
-    if (config == NULL || pData == NULL)
+    if (pList == NULL || pData == NULL)
     {
         status = CBUFFER_STATUS_FAILED;
     }
-    else if (config->dataBuffer == NULL)
+    else if (pList->dataBuffer == NULL)
     {
         status = CBUFFER_STATUS_NOT_INITIALISED;
     }
     else
     {
-        status = circularBufferDynamicPut_internal(config, pData);
+        status = circularBufferDynamicPut_internal(pList, pData);
     }
     
     return status;
 }
 
-cBufferStatus_t circularBufferDynamicPutSafe(circularBufferDynamicList_t *config, void *pData)
+cBufferStatus_t circularBufferDynamicPutSafe(circularBufferDynamicList_t *pList, void *pData)
 {
     cBufferStatus_t status = CBUFFER_STATUS_OK;
 
-    if (config == NULL || pData == NULL)
+    if (pList == NULL || pData == NULL)
     {
         status = CBUFFER_STATUS_FAILED;
     }
-    else if (config->dataBuffer == NULL)
+    else if (pList->dataBuffer == NULL)
     {
         status = CBUFFER_STATUS_NOT_INITIALISED;
     }
-    else if (circularBufferDynamicIsFull(config))
+    else if (circularBufferDynamicIsFull(pList))
     {
         status = CBUFFER_STATUS_FULL;
     }
     else
     {
-        status = circularBufferDynamicPut_internal(config, pData);
+        status = circularBufferDynamicPut_internal(pList, pData);
     }
 
     return status;
 }
 
 
-cBufferStatus_t circularBufferDynamicGet(circularBufferDynamicList_t *config, void *pDataOut)
+cBufferStatus_t circularBufferDynamicGet(circularBufferDynamicList_t *pList, void *pDataOut)
 {
     cBufferStatus_t status = CBUFFER_STATUS_OK;
 
-    if (config == NULL || pDataOut == NULL)
+    if (pList == NULL || pDataOut == NULL)
     {
         status = CBUFFER_STATUS_FAILED;
     }
-    else if (config->dataBuffer == NULL)
+    else if (pList->dataBuffer == NULL)
     {
         status = CBUFFER_STATUS_NOT_INITIALISED;
     }
-    else if (circularBufferDynamicIsEmpty(config))
+    else if (circularBufferDynamicIsEmpty(pList))
     {
         status = CBUFFER_STATUS_EMPTY;
     }
     else
     {
-        uint8_t *pData = config->dataBuffer;
+        uint8_t *pData = pList->dataBuffer;
 
-        memcpy(pDataOut, &pData[config->get_index * config->dataSize], config->dataSize);
-        config->get_index = getNextIndex(config->get_index, config->capacity);
-        config->counter--;
+        memcpy(pDataOut, &pData[pList->get_index * pList->dataSize], pList->dataSize);
+        pList->get_index = getNextIndex(pList->get_index, pList->capacity);
+        pList->counter--;
     }
 
     return status;

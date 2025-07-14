@@ -3,7 +3,7 @@
 ## Run commands
 ```bash
 # Clean build
-rm -rf build        # Or "rmdir /s /q build" on Windows
+rm -rf build
 
 # Generate build
 cmake -S . -B build

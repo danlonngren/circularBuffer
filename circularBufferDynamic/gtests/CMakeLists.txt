@@ -1,24 +1,19 @@
-if (BUILD_TESTING)
-    # Include the circularBufferStatic library
-    include_directories(${CMAKE_SOURCE_DIR}/circularBufferDynamic)
+# Setup test executable
+add_executable(circularBufferDynamicTests 
+    circularBufferDynamicTests.cpp
+)
 
-    set(SOURCES
-        circularBufferDynamicTests.cpp
-    )
-
-    # Setup test executable
-    add_executable(circularBufferDynamicTests 
-        ${SOURCES}
-    )
-    
-    target_link_libraries(circularBufferDynamicTests PUBLIC 
+target_link_libraries(circularBufferDynamicTests 
+    PRIVATE 
         GTest::gtest_main
         circularBufferDynamic
-    )
+)
 
-    add_test(
-        NAME circularBufferDynamicTests
-        COMMAND circularBufferDynamicTests
-    )
-    
-endif()
+target_include_directories(circularBufferDynamicTests
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/circularBufferDynamic
+
+)
+
+include(GoogleTest)
+gtest_discover_tests(circularBufferDynamicTests)
