@@ -5,9 +5,7 @@
 
 /* Helper Functions */
 static uint32_t getNextIndex(uint32_t index, uint32_t capacity) {
-    if ((++index) > (capacity))
-        index = 0;
-    return index;
+    return (index + 1) % capacity;
 }
 
 /* Public APIs */
@@ -21,7 +19,7 @@ cBufferStatus_t circularBuffStatic_create(circularBuffStaticList_t *pList, void 
     else {
         pListInt->dataBuffer = dataBuffer;
         pListInt->dataSize = dataSize;
-        pListInt->capacity = (capacity / dataSize);
+        pListInt->bufferSizeBytes = (capacity / dataSize);
         pListInt->pop_index = 0;
         pListInt->put_index = 0;
         pListInt->counter = 0;
@@ -55,11 +53,11 @@ cBufferStatus_t circularBuffStatic_put(circularBuffStaticList_t *pList, void *pD
     }
     else {
         memcpy((void *)&pList->dataBuffer[pListInt->put_index * pListInt->dataSize], pData, pListInt->dataSize);
-        pListInt->put_index = getNextIndex(pListInt->put_index, pListInt->capacity);
+        pListInt->put_index = getNextIndex(pListInt->put_index, pListInt->bufferSizeBytes);
         /* Handle wraparound */
-        if (++pListInt->counter > pListInt->capacity) {
-            pListInt->counter = pListInt->capacity;
-            pListInt->pop_index = getNextIndex(pListInt->pop_index, pListInt->capacity);
+        if (++pListInt->counter > pListInt->bufferSizeBytes) {
+            pListInt->counter = pListInt->bufferSizeBytes;
+            pListInt->pop_index = getNextIndex(pListInt->pop_index, pListInt->bufferSizeBytes);
         }
         status = CBUFFER_STATUS_OK;    
     }
@@ -82,9 +80,9 @@ cBufferStatus_t circularBuffStatic_putSafe(circularBuffStaticList_t *pList, void
     }
     else {
         memcpy((void*)&pList->dataBuffer[pListInt->put_index * pListInt->dataSize], pData, pListInt->dataSize);
-        pListInt->put_index = getNextIndex(pListInt->put_index, pListInt->capacity);
-        if (++pListInt->counter > pListInt->capacity) {
-            pListInt->counter = pListInt->capacity;
+        pListInt->put_index = getNextIndex(pListInt->put_index, pListInt->bufferSizeBytes);
+        if (++pListInt->counter > pListInt->bufferSizeBytes) {
+            pListInt->counter = pListInt->bufferSizeBytes;
         }
         status = CBUFFER_STATUS_OK;    
     }
@@ -108,7 +106,7 @@ cBufferStatus_t circularBuffStatic_pop(circularBuffStaticList_t *pList, void *pD
     else {
         uint8_t *pData = pListInt->dataBuffer;
         memcpy(pDataOut, &pData[pListInt->pop_index * pListInt->dataSize], pListInt->dataSize);
-        pListInt->pop_index = getNextIndex(pListInt->pop_index, pListInt->capacity);
+        pListInt->pop_index = getNextIndex(pListInt->pop_index, pListInt->bufferSizeBytes);
         pListInt->counter--;
 
         if (circularBuffStatic_isEmpty(pListInt)) {
@@ -123,7 +121,7 @@ bool circularBuffStatic_isFull(circularBuffStaticList_t *pList) {
     if (!pList) {
         return false;
     }
-    return (pList->counter == (pList->capacity ));
+    return (pList->counter == (pList->bufferSizeBytes ));
 }
 
 bool circularBuffStatic_isEmpty(circularBuffStaticList_t *pList) {
@@ -142,7 +140,7 @@ uint32_t circularBuffStatic_getSize(circularBuffStaticList_t *pList) {
 
 uint32_t circularBuffStatic_capacity(circularBuffStaticList_t *pList) {
     if (!pList) {
-        return false;
+        return 0;
     }
-    return pList->capacity * pList->dataSize;
+    return pList->bufferSizeBytes * pList->dataSize;
 }

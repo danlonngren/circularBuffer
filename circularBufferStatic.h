@@ -12,13 +12,15 @@ CBUFFER_STATUS_EMPTY            = -3,
 CBUFFER_STATUS_FAILED           = -4,
 }cBufferStatus_t;
 
+/* Structure is visible but should only be used via the APIs.
+ * This is done in order to avoid having to dynamically create list*/
 typedef struct {
     /* Buffer control info */
     uint32_t put_index;
     uint32_t pop_index;
     uint32_t counter;
     /* Buffer data and storage */
-    uint32_t capacity;
+    uint32_t bufferSizeBytes;
     uint32_t dataSize;
     uint8_t *dataBuffer;
 } circularBuffStaticList_t;

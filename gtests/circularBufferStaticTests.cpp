@@ -17,7 +17,7 @@ protected:
 
 // Test: Buffer Creation
 TEST_F(CircularBufferTest, CreateBuffer) {
-    EXPECT_EQ(buffer.capacity, circularBuffStatic_capacity(&buffer) / buffer.dataSize);
+    EXPECT_EQ(buffer.bufferSizeBytes, circularBuffStatic_capacity(&buffer) / buffer.dataSize);
     EXPECT_EQ(buffer.dataSize, 1);
     EXPECT_EQ(buffer.counter, 0);
     EXPECT_EQ(buffer.put_index, 0);
@@ -32,7 +32,7 @@ TEST_F(CircularBufferTest, IsEmpty) {
 
 // Test: Buffer Is Full
 TEST_F(CircularBufferTest, IsFull) {
-    for (int i = 0; i < buffer.capacity; ++i) {
+    for (int i = 0; i < buffer.bufferSizeBytes; ++i) {
         uint8_t data = i;
         circularBuffStatic_put(&buffer, &data);
     }
@@ -70,7 +70,7 @@ TEST_F(CircularBufferTest, PutOverflow) {
 
 // Test: Put Safe (Prevent Overwriting)
 TEST_F(CircularBufferTest, PutSafe) {
-    for (int i = 0; i < buffer.capacity; ++i) {
+    for (int i = 0; i < buffer.bufferSizeBytes; ++i) {
         uint8_t data = i;
         EXPECT_EQ(circularBuffStatic_putSafe(&buffer, &data), CBUFFER_STATUS_OK);
     }
@@ -113,7 +113,7 @@ class CircularBufferLargeDataTest : public ::testing::Test {
     
     // Test: Buffer Creation
     TEST_F(CircularBufferLargeDataTest, CreateBuffer) {
-        EXPECT_EQ(buffer.capacity, circularBuffStatic_capacity(&buffer) / buffer.dataSize);
+        EXPECT_EQ(buffer.bufferSizeBytes, circularBuffStatic_capacity(&buffer) / buffer.dataSize);
         EXPECT_EQ(buffer.dataSize, 4);
         EXPECT_EQ(buffer.counter, 0);
         EXPECT_EQ(buffer.put_index, 0);
