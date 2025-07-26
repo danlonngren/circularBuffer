@@ -1,22 +1,21 @@
 cmake_minimum_required(VERSION 3.28.3)
 project(circularBufferApp LANGUAGES C CXX) 
 
-# Enable use of VERSION in project()
-if(POLICY CMP0048)
-    cmake_policy(SET CMP0048 NEW)
-endif()
+add_library(circularBufferStatic STATIC
+	circularBufferStatic.c
+    circularBufferStatic.h
+)
 
-project(circularBufferApp VERSION 0.1.1 DESCRIPTION "Circular Buffers" LANGUAGES C CXX) 
+target_include_directories(circularBufferStatic
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 17)
+target_compile_features(circularBufferStatic PRIVATE c_std_99)
+target_compile_features(circularBufferStatic PRIVATE cxx_std_17)
 
-add_subdirectory(circularBufferStatic)
-add_subdirectory(circularBufferDynamic)
-
+option(BUILD_TESTS "Build GoogleTests" OFF)
 if(BUILD_TESTS)
     enable_testing()
-    add_subdirectory(external/googletest)
-    add_subdirectory(circularBufferDynamic/gtests)
-    add_subdirectory(circularBufferStatic/gtests)
+    add_subdirectory(gtests)
 endif()
